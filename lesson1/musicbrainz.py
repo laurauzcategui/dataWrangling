@@ -62,10 +62,12 @@ def main():
     pretty_print("Begin area name for Queen: " + results_queen["artists"][0]["begin-area"]["name"])
 
     results_beatles = query_by_name(ARTIST_URL, query_type["simple"], "Beatles")
-    #pretty_print(results_beatles)
     beatles_id = results_beatles["artists"][0]["id"]
     alias_data = query_site(ARTIST_URL, query_type["aliases"], beatles_id)
     aliases_beatles = alias_data["aliases"]
+    pretty_print(aliases_beatles)
+    beatle = [x["name"] for x in aliases_beatles if x["locale"]=='es']
+    print beatle[0]
 
 '''
     artist_id = results["artists"][1]["id"]
