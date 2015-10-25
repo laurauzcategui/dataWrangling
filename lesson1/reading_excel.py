@@ -12,7 +12,10 @@ Please see the test function for the expected return format
 import xlrd
 import numpy as np
 from zipfile import ZipFile
-datafile = "2013_ERCOT_Hourly_Load_Data.xls"
+import pprint
+
+datafile = "2013_ERCOT_Hourly_Load_Data"
+filename = "2013_ERCOT_Hourly_Load_Data.xls"
 
 
 def open_zip(datafile):
@@ -46,19 +49,25 @@ def parse_file(datafile):
     max_time = sheet.cell_value(find_row(data['maxvalue'],sheet), 0)
     min_time = sheet.cell_value(find_row(data['minvalue'],sheet), 0)
 
+    #find row can be done with: .index function
+    # coast.index(data['maxvalue'])
+    # coast.index(data['minvalue'])
+
     data['maxtime'] = xlrd.xldate_as_tuple(max_time, 0)
     data['mintime'] = xlrd.xldate_as_tuple(min_time, 0)
 
 
     return data
 
-
 def test():
     open_zip(datafile)
-    data = parse_file(datafile)
+    data = parse_file(filename)
 
     assert data['maxtime'] == (2013, 8, 13, 17, 0, 0)
     assert round(data['maxvalue'], 10) == round(18779.02551, 10)
 
 
+open_zip(datafile)
+data = parse_file(filename)
+pprint.pprint(data)
 print test()
