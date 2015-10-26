@@ -11,11 +11,11 @@ ARTIST_URL = BASE_URL + "artist/"
 
 # query parameters are given to the requests.get function as a dictionary; this
 # variable contains some starter parameters.
-query_type = {  "simple": {},
+query_type = {"simple": {},
                 "atr": {"inc": "aliases+tags+ratings"},
                 "aliases": {"inc": "aliases"},
                 "releases": {"inc": "releases"},
-                "area": {"inc" : "area"}}
+                "area": {"inc": "area"}}
 
 
 def query_site(url, params, uid="", fmt="json"):
@@ -55,34 +55,33 @@ def main():
     the structure one level at a time or copy the output to a separate output
     file.
     '''
-    results = query_by_name(ARTIST_URL, query_type["simple"], "First Aid Kid")
-    pretty_print("There are " + str(results["count"]) + " bands called First Aid Kid")
+    # Find number of bands called "First Aid Kid"
+    results = query_by_name(ARTIST_URL, query_type["simple"], "First Aid Kit")
+    #pretty_print(results)
+    list_bands = [x["name"] for x in results["artists"] if x["name"]=='First Aid Kit']
+    print "There are " + str(len(list_bands)) + " bands called First Aid Kid"
 
+    # Find begin-area name for Queen
     results_queen = query_by_name(ARTIST_URL, query_type["simple"], "Queen")
     pretty_print("Begin area name for Queen: " + results_queen["artists"][0]["begin-area"]["name"])
 
+    # Find spanish alias for the Beatles
     results_beatles = query_by_name(ARTIST_URL, query_type["simple"], "Beatles")
     beatles_id = results_beatles["artists"][0]["id"]
     alias_data = query_site(ARTIST_URL, query_type["aliases"], beatles_id)
     aliases_beatles = alias_data["aliases"]
-    pretty_print(aliases_beatles)
+    #pretty_print(aliases_beatles)
     beatle = [x["name"] for x in aliases_beatles if x["locale"]=='es']
     print beatle[0]
 
-'''
-    artist_id = results["artists"][1]["id"]
-    print "\nARTIST:"
-    pretty_print(results["artists"][1])
 
-    artist_data = query_site(ARTIST_URL, query_type["releases"], artist_id)
-    releases = artist_data["releases"]
-    print "\nONE RELEASE:"
-    pretty_print(releases[0], indent=2)
-    release_titles = [r["title"] for r in releases]
+    # Find disambiguation for Nirvana
+    results_nirvana = query_by_name(ARTIST_URL, query_type["simple"], "Nirvana")
+    pretty_print(results_nirvana["artists"][0]["disambiguation"])
 
-    print "\nALL TITLES:"
-    for t in release_titles:
-        print t
-'''
+    #Find When One Direction was formed
+    results_oneD = query_by_name(ARTIST_URL, query_type["simple"], "One Direction")
+    pretty_print(results_oneD["artists"][0]["life-span"]["begin"])
+
 if __name__ == '__main__':
     main()
