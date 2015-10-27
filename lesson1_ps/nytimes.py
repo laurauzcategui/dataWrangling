@@ -27,22 +27,38 @@ URL_POPULAR = URL_MAIN + "mostpopular/v2/"
 API_KEY = { "popular": "11bd2079a04b60203c05025203b5af5f:11:73308009",
             "article": "9fc83a32c808abba8451df797abf4057:18:73308009"}
 
+def pretty_print(data, indent=4):
+    # After we get our output, we can format it to be more readable
+    # by using this function.
+    if type(data) == dict:
+        print json.dumps(data, indent=indent, sort_keys=True)
+    else:
+        print data
 
 def get_from_file(kind, period):
     filename = "popular-{0}-{1}.json".format(kind, period)
-    with open(filename, "r") as f:
+    with codecs.open(filename, "r",encoding='utf8') as f:
         return json.loads(f.read())
 
 
 def article_overview(kind, period):
 
-    save_file("viewed",1)
+    #save_file("viewed",1)
     data = get_from_file(kind, period)
     titles = []
     urls =[]
+    elem = {}
     # YOUR CODE HERE
-    for x in data:
-        print x
+    for r in data:
+        elem["Section"] = r["title"].encode('utf-8')
+        titles.append(elem)
+        if "media" in r and r["media"] != '':
+            media_meta = [x["media-metadata"] for x in r["media"] if "media-metadata" in x]
+            meta_elem = [ l["url"]  for j in media_meta for l in j if l["format"] == "Standard Thumbnail"]
+            for url in meta_elem:
+                urls.append(url)
+            #media_url = [k["url"] for k in [l for l in media_meta] if k["format"] == "Standard Thumbnail"]
+            #print media_url
     return (titles, urls)
 
 
