@@ -49,16 +49,14 @@ def article_overview(kind, period):
     urls =[]
     elem = {}
     # YOUR CODE HERE
-    for r in data[1:21]:
-        elem["Section"] = r["title"].encode('utf-8')
+    for r in data:
+        elem = {r["section"]:r["title"].encode('utf-8')}
         titles.append(elem)
         if "media" in r and r["media"] != '':
             media_meta = [x["media-metadata"] for x in r["media"] if "media-metadata" in x]
             meta_elem = [ l["url"]  for j in media_meta for l in j if l["format"] == "Standard Thumbnail"]
             for url in meta_elem:
                 urls.append(url)
-            #media_url = [k["url"] for k in [l for l in media_meta] if k["format"] == "Standard Thumbnail"]
-            #print media_url
     return (titles, urls)
 
 
