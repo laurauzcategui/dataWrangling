@@ -4,6 +4,7 @@
 # See the provided data structure for the expected format.
 # The tags for first name, surname and email should map directly
 # to the dictionary keys
+# @laura_uzcategui
 import xml.etree.ElementTree as ET
 
 article_file = "exampleResearchArticle.xml"
