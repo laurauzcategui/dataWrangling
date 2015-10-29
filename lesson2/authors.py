@@ -24,6 +24,16 @@ def get_authors(root):
         }
 
         # YOUR CODE HERE
+        fnm = author.find("fnm")
+        snm = author.find("snm")
+        email = author.find("email")
+
+        if fnm is not None:
+            data["fnm"] = fnm.text
+        if snm is not None:
+            data["snm"] = snm.text
+        if email is not None:
+            data["email"] = email.text
 
         authors.append(data)
 
