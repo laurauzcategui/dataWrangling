@@ -27,6 +27,7 @@ import codecs
 import csv
 import json
 import pprint
+import pandas as pd
 
 CITIES = 'cities.csv'
 
@@ -40,6 +41,28 @@ def audit_file(filename, fields):
     listtypes = []
     x = 0
     # YOUR CODE HERE
+    df = pd.read_csv(filename)
+    df_cities = pd.DataFrame(df,columns=FIELDS)
+    for field in fields:
+        for elem in df_cities[field]:
+            if (elem == "NULL" or elem == "") and (NoneType not in listtypes):
+                listtypes.append(NoneType)
+            else if elem.startswith('{') and list not in listtypes:
+                listtypes.append(list)
+            else if type(elem) == float:
+                try:
+                    x = int(elem)
+                    if int not in listtypes:
+                        listtypes.append(int)
+                except ValueError:
+                    if float not in listtypes:
+                        listtypes.append(float)
+            else
+                if str no in listtypes:
+                    listtypes.append(str)
+        fieldtypes[field] = set(listtypes)
+        listtypes = []
+    '''
     with open(filename, 'rb') as f:
         reader = csv.reader(f)
         for row in reader:
@@ -59,7 +82,7 @@ def audit_file(filename, fields):
                 else
                     if str no in listtypes:
                         listtypes.append(str)
-                        
+    '''
 
     return fieldtypes
 
