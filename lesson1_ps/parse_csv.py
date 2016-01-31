@@ -17,7 +17,6 @@ You should only change the parse_file function.
 import csv
 import os
 
-DATADIR = ""
 DATAFILE = "745090.csv"
 
 def parse_file(datafile):
@@ -41,6 +40,8 @@ def parse_file(datafile):
 def test():
     datafile = os.path.join(DATADIR, DATAFILE)
     name, data = parse_file(datafile)
+    print name
+    print data
 
     assert name == "MOUNTAIN VIEW MOFFETT FLD NAS"
     assert data[0][1] == "01:00"
