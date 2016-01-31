@@ -13,7 +13,7 @@ The possible types of values can be:
    as float but int('3.23e+07') will throw a ValueError
 - 'str', for all other values
 
-The audit_file function should return a dictionary containing fieldnames and a
+The audit_file function should return a cictionary containing fieldnames and a
 SET of the types that can be found in the field. e.g.
 {"field1: set([float, int, str]),
  "field2: set([str]),
@@ -28,6 +28,9 @@ import csv
 import json
 import pprint
 import pandas as pd
+import re
+import math
+import numpy as np
 
 CITIES = 'cities.csv'
 
@@ -40,52 +43,36 @@ def audit_file(filename, fields):
     fieldtypes = {}
     listtypes = []
     x = 0
+    is_nan = 0
     # YOUR CODE HERE
     df = pd.read_csv(filename)
     df_cities = pd.DataFrame(df,columns=FIELDS)
     for field in fields:
-        for elem in df_cities[field]:
-            if (elem == "NULL" or elem == "") and (NoneType not in listtypes):
-                listtypes.append(NoneType)
-            else if elem.startswith('{') and list not in listtypes:
-                listtypes.append(list)
-            else if type(elem) == float:
+        for elem in df_cities.loc[3:,field]:
+            try:
+                float(elem) and int(elem)
+                listtypes.append(int)
+            except ValueError:
                 try:
-                    x = int(elem)
-                    if int not in listtypes:
-                        listtypes.append(int)
-                except ValueError:
-                    if float not in listtypes:
+                    math.isnan(float(elem))
+                    if float(str(elem)) != float(str(elem)):
+                        is_nan = 1
+                        raise ValueError
+                    else:
                         listtypes.append(float)
-            else
-                if str no in listtypes:
-                    listtypes.append(str)
+                except ValueError:
+                    if (is_nan == 1 or elem is None or type(elem) is None):
+                        listtypes.append(type(None))
+                        is_nan = 0
+                    elif re.search('^{.*',str(elem).strip()) is not None:
+                        print str(elem) + "field=" + field
+                        listtypes.append(list)
+                    else:
+                        listtypes.append(str)
         fieldtypes[field] = set(listtypes)
         listtypes = []
-    '''
-    with open(filename, 'rb') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            for i,field in enumerate(fields):
-                if (row[i] == "NULL" or row[i] == "") and (NoneType not in listtypes):
-                    listtypes.append(NoneType)
-                else if row[i].startswith('{') and list not in listtypes:
-                    listtypes.append(list)
-                else if type(row[i]) == float:
-                    try:
-                        x = int(row[i])
-                        if int not in listtypes:
-                            listtypes.append(int)
-                    except ValueError:
-                        if float not in listtypes:
-                            listtypes.append(float)
-                else
-                    if str no in listtypes:
-                        listtypes.append(str)
-    '''
 
     return fieldtypes
-
 
 def test():
     fieldtypes = audit_file(CITIES, FIELDS)
