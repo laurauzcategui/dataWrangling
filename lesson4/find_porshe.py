@@ -14,7 +14,9 @@ https://www.udacity.com/wiki/ud032
 
 def porsche_query():
     # Please fill in the query to find all autos manuafactured by Porsche.
-    query = {'manufacturer':'Porsche'}
+    # example multiple query
+    #query = {'manufacturer_label':'Porsche', 'class_label':'Sports car'}
+    query = {'manufacturer':'Porsche' }
     return query
 
 
