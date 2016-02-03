@@ -54,7 +54,7 @@ FIELDS ={'rdf-schema#label': 'label',
          'kingdom_label': 'kingdom',
          'genus_label': 'genus'}
 
-SYNOS = []
+synos = []
 
 
 def fix_schema_label(field):
@@ -81,7 +81,7 @@ def fix_schema_synom(field):
 
 def audit_fields(value,key):
     if key == "synonym" and value != "NULL":
-        SYNOS.append(value)
+        synos.append(value)
 
 def process_file(filename, fields):
     process_fields = fields.keys()
