@@ -57,9 +57,8 @@ FIELDS ={'rdf-schema#label': 'label',
 synos = []
 CLASSIFIERS = ['family','class','phylum','order','kingdom','genus']
 
-
-def fix_schema_label(field):
-    result = re.split('\(.*\)',field)
+def fix_schema_label(label):
+    result = re.split('\(.*\)',label)
     return  result[0]
 
 def fix_schema_name(name,label):
@@ -67,12 +66,12 @@ def fix_schema_name(name,label):
         name = label
     return name
 
-def fix_schema_general(field):
-    if field == "NULL":
-        field = None
-    elif type(field) == str:
-        field = field.strip()
-    return field
+def fix_schema_general(value,key):
+    if str(value) == "NULL" and key is not 'name':
+        value = None
+    elif type(value) == str:
+        value = value.strip()
+    return value
 
 def fix_schema_synom(field):
     fiedList = []
@@ -82,7 +81,6 @@ def fix_schema_synom(field):
 
 def fix_schema_class(field, classifiers):
     field['classification'] = {}
-    pprint.pprint(field)
     for key,value in field.items():
         if key in CLASSIFIERS:
             field['classification'][key] = field.pop(key)
@@ -92,34 +90,54 @@ def audit_fields(value,key):
     if key == "synonym" and value != "NULL":
         synos.append(value)
 
+def sort_dict(dictio):
+    structure = {
+        "synonym": None,
+        "name": None,
+        "classification": {
+            "kingdom": None,
+            "family": None,
+            "order":  None,
+            "phylum": None,
+            "genus": None,
+            "class": None
+        },
+        "uri": None,
+        "label": None,
+        "description": None
+    }
+    for key, value in dictio.items():
+        structure[key] = dictio.pop(key)
+    return structure
+
 def process_file(filename, fields):
     process_fields = fields.keys()
-    values_fields = fields.values()
-    data = []
-    clasification = {}
+    datalist = []
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
         for i in range(3):
             l = reader.next()
 
         for field in reader:
-            for key,value in field.items():
-                if (key in process_fields):
-                    #audit_fields(value,key)
-                    if key == 'rdf-schema#label':
+            new_dict = dict()
+            for key, value in field.items():
+                if key in process_fields:
+                    if key == "rdf-schema#label":
                         value = fix_schema_label(value)
-                    elif key == 'name':
+                    if key == "name":
                         value = fix_schema_name(value,field['label'])
-                    elif key == 'synonym':
+                    if key == "synonym":
                         value = fix_schema_synom(value)
-                    value = fix_schema_general(value)
+                    print key,value
+                    value = fix_schema_general(value,key)
+                    print key,value
                     field[fields[key]] = field.pop(key)
                 else:
                     field.pop(key)
             field = fix_schema_class(field, CLASSIFIERS)
-            data.append(field)
-    return data
-
+            new_dict = dict(sort_dict(field))
+            datalist.append(new_dict)
+        return datalist
 
 def parse_array(v):
     if (v[0] == "{") and (v[-1] == "}"):
