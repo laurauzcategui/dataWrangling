@@ -55,6 +55,7 @@ FIELDS ={'rdf-schema#label': 'label',
          'genus_label': 'genus'}
 
 synos = []
+CLASSIFIERS = ['family','class','phylum','order','kingdom','genus']
 
 
 def fix_schema_label(field):
@@ -79,14 +80,23 @@ def fix_schema_synom(field):
         field = [i.strip('*').strip() for i in re.split('[|]', field.strip('{').strip('}'))]
     return field
 
+def fix_schema_class(field, classifiers):
+    field['classification'] = {}
+    pprint.pprint(field)
+    for key,value in field.items():
+        if key in CLASSIFIERS:
+            field['classification'][key] = field.pop(key)
+    return field
+
 def audit_fields(value,key):
     if key == "synonym" and value != "NULL":
         synos.append(value)
 
 def process_file(filename, fields):
     process_fields = fields.keys()
+    values_fields = fields.values()
     data = []
-    new_dict = {}
+    clasification = {}
     with open(filename, "r") as f:
         reader = csv.DictReader(f)
         for i in range(3):
@@ -94,7 +104,7 @@ def process_file(filename, fields):
 
         for field in reader:
             for key,value in field.items():
-                if key in process_fields:
+                if (key in process_fields):
                     #audit_fields(value,key)
                     if key == 'rdf-schema#label':
                         value = fix_schema_label(value)
@@ -104,7 +114,10 @@ def process_file(filename, fields):
                         value = fix_schema_synom(value)
                     value = fix_schema_general(value)
                     field[fields[key]] = field.pop(key)
-                data.append(field)
+                else:
+                    field.pop(key)
+            field = fix_schema_class(field, CLASSIFIERS)
+            data.append(field)
     return data
 
 
