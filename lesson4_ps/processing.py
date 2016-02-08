@@ -74,7 +74,6 @@ def fix_schema_general(value,key):
     return value
 
 def fix_schema_synom(field):
-    fiedList = []
     if re.search('.*{.*', str(field)):
         field = [i.strip('*').strip() for i in re.split('[|]', field.strip('{').strip('}'))]
     return field
@@ -124,24 +123,26 @@ def process_file(filename, fields):
                 if key in process_fields:
                     if key == "rdf-schema#label":
                         value = fix_schema_label(value)
-                    if key == "name":
-                        value = fix_schema_name(value,field['label'])
+                    if key == "name" and (value == "NULL" or re.findall('\W', value)):
+                        if "label" in field:
+                            value = field["label"]
+                        elif "rdf-schema#label" in field:
+                            value = field["rdf-schema#label"]
                     if key == "synonym":
                         value = fix_schema_synom(value)
-                    print key,value
+                        if type(value) is not list and value != "NULL":
+                            value = [value]
                     value = fix_schema_general(value,key)
-                    print key,value
-                    field[fields[key]] = field.pop(key)
+                    new_dict[fields[key]] = value
                 else:
                     field.pop(key)
-            field = fix_schema_class(field, CLASSIFIERS)
-            new_dict = dict(sort_dict(field))
+            new_dict = fix_schema_class(new_dict, CLASSIFIERS)
             datalist.append(new_dict)
         return datalist
 
 def parse_array(v):
     if (v[0] == "{") and (v[-1] == "}"):
-        v = v.lstrip("{")
+        v = v.lsctrip("{")
         v = v.rstrip("}")
         v_array = v.split("|")
         v_array = [i.strip() for i in v_array]
@@ -169,6 +170,7 @@ def test():
         "description": "The genus Argiope includes rather large and spectacular spiders that often have a strikingly coloured abdomen. These spiders are distributed throughout the world. Most countries in tropical or temperate climates host one or more species that are similar in appearance. The etymology of the name is from a Greek name meaning silver-faced."
     }
 
+    #pprint.pprint(data[48])
     assert len(data) == 76
     assert data[0] == first_entry
     assert data[17]["name"] == "Ogdenia"
