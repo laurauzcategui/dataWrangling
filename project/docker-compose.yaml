@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  jupyter:
+    image: continuumio/anaconda
+    ports:
+      - 8888:8888
+    command: bash -c "/opt/conda/bin/conda config --add channels conda-forge && /opt/conda/bin/conda install jupyter prettytable cerberus -y --quiet && /opt/conda/bin/jupyter notebook --notebook-dir=/data --ip='*' --port=8888  --no-browser --allow-root"
+    volumes:
+      - /Users/laura.uzcategui/Documents/projects/dataWrangling/project:/data
